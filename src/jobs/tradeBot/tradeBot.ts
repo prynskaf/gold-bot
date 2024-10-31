@@ -19,7 +19,6 @@ interface PricePoint {
 
 // Function to fetch logs (for the API)
 export function getLiveLogs(): LogEntry[] {
-  // Return the last 5 logs, ordered with the latest first
   return logStore.slice(-5).reverse();
 }
 
@@ -28,7 +27,7 @@ async function executeTrade(): Promise<void> {
   try {
     const currentPrice: number = await fetchGoldPrice();
     const recentPrices: PricePoint[] = Array.from({ length: 15 }, () => ({
-      price: currentPrice + (Math.random() - 0.5) * 5,
+      price: currentPrice + (Math.random() - 0.5) * 10, // Increased random fluctuation
     }));
 
     const rsi: number | null = calculateRSI(recentPrices);
@@ -40,17 +39,17 @@ async function executeTrade(): Promise<void> {
       return;
     }
 
-    // Since the RSI is already rounded in the calculateRSI function, we use it directly
+    // Adjusted trading logic based on new RSI thresholds
     let signal: 'Buy' | 'Sell' | 'Hold' = 'Hold';
     let stopLoss: number = 0;
     let takeProfit: number = 0;
 
-    // Trading logic based strictly on RSI values
-    if (rsi < 30) {
+    // Lowered thresholds for buying and raised for selling
+    if (rsi < 45) { // Buy signal at RSI below 45
       signal = 'Buy';
       stopLoss = currentPrice - 10;
       takeProfit = currentPrice + 20;
-    } else if (rsi > 70) {
+    } else if (rsi > 55) { // Sell signal at RSI above 55
       signal = 'Sell';
       stopLoss = currentPrice + 10;
       takeProfit = currentPrice - 20;
@@ -65,7 +64,7 @@ async function executeTrade(): Promise<void> {
         stopLoss,
         takeProfit,
         currentPrice,
-        rsi, // Use the RSI value directly as it's already rounded
+        rsi,
         timestamp: new Date(),
       });
 
