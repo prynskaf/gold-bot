@@ -1,8 +1,8 @@
-// src/jobs/tradeBot.ts
+// /src/jobs/tradeBot.ts
 import cron from 'node-cron';
-import { calculateRSI } from '@/utils/rsi';
-import { getDb } from '@/lib/mongodb';
-import { fetchGoldPrice } from '@/utils/fetchGoldPrice';
+import { calculateRSI } from '@/utils/rsi/rsi';
+import { getDb } from '@/lib/mongodb/mongodb';
+import { fetchGoldPrice } from '@/utils/fetchGoldPrice/fetchGoldPrice';
 
 // Log store structure and initialization
 interface LogEntry {
@@ -12,7 +12,6 @@ interface LogEntry {
 
 const logStore: LogEntry[] = [];
 
-
 // Interface for the recent price used in RSI calculation
 interface PricePoint {
   price: number;
@@ -20,37 +19,9 @@ interface PricePoint {
 
 // Function to fetch logs (for the API)
 export function getLiveLogs(): LogEntry[] {
-  // Return the last 5 logs for efficiency
-  return logStore.slice(-5);
+  // Return the last 5 logs, ordered with the latest first
+  return logStore.slice(-5).reverse();
 }
-
-// Function to fetch the current price of XAU/USD from Swissquote
-// async function fetchGoldPrice(): Promise<number> {
-//   try {
-//     const response = await axios.get<PriceData[]>(API_URL);
-//     const data = response.data;
-
-//     if (!Array.isArray(data) || data.length === 0) {
-//       throw new Error('Invalid response structure or no data available');
-//     }
-
-//     for (const item of data) {
-//       const primeProfile = item.spreadProfilePrices.find((profile: SpreadProfile) =>
-//         profile.spreadProfile.toLowerCase() === 'prime'
-//       );
-//       if (primeProfile) {
-//         return primeProfile.bid;
-//       }
-//     }
-
-//     throw new Error('No Prime profile found in the data');
-//   } catch (error: unknown) {
-//     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-//     console.error('Error fetching gold price:', errorMessage);
-//     logStore.push({ message: `Error fetching gold price: ${errorMessage}`, timestamp: new Date().toISOString() });
-//     throw new Error('Failed to fetch gold price data');
-//   }
-// }
 
 // Function to execute a trade based on the RSI calculation
 async function executeTrade(): Promise<void> {
@@ -69,18 +40,17 @@ async function executeTrade(): Promise<void> {
       return;
     }
 
-    // Round the RSI value to 2 decimal places
-    const roundedRSI = Math.round(rsi * 100) / 100;
-
+    // Since the RSI is already rounded in the calculateRSI function, we use it directly
     let signal: 'Buy' | 'Sell' | 'Hold' = 'Hold';
     let stopLoss: number = 0;
     let takeProfit: number = 0;
 
-    if (roundedRSI < 30) {
+    // Trading logic based strictly on RSI values
+    if (rsi < 30) {
       signal = 'Buy';
       stopLoss = currentPrice - 10;
       takeProfit = currentPrice + 20;
-    } else if (roundedRSI > 70) {
+    } else if (rsi > 70) {
       signal = 'Sell';
       stopLoss = currentPrice + 10;
       takeProfit = currentPrice - 20;
@@ -95,15 +65,15 @@ async function executeTrade(): Promise<void> {
         stopLoss,
         takeProfit,
         currentPrice,
-        rsi: roundedRSI, // Save the rounded RSI value in the database
+        rsi, // Use the RSI value directly as it's already rounded
         timestamp: new Date(),
       });
 
-      const logMessage = `Executed trade: ${signal} at ${currentPrice}, RSI: ${roundedRSI}`;
+      const logMessage = `Executed trade: ${signal} at ${currentPrice}, RSI: ${rsi}`;
       console.log(logMessage);
       logStore.push({ message: logMessage, timestamp });
     } else {
-      const logMessage = `No trade executed, RSI is within neutral range: ${roundedRSI}`;
+      const logMessage = `No trade executed, RSI is within neutral range: ${rsi}`;
       console.log(logMessage);
       logStore.push({ message: logMessage, timestamp });
     }

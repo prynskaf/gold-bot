@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+
 // API URL for fetching gold price data
 const API_URL = 'https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAU/USD';
 
@@ -48,3 +49,6 @@ export async function fetchGoldPrice(): Promise<number> {
     throw new Error('Failed to fetch gold price data');
   }
 }
+
+
+

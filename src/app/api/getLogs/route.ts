@@ -1,6 +1,6 @@
 // GET LOGS
 import { NextRequest, NextResponse } from 'next/server';
-import { getLiveLogs } from '@/jobs/tradeBot'; // Make sure this path is correct
+import { getLiveLogs } from '@/jobs/tradeBot/tradeBot'; // Make sure this path is correct
 
 export async function GET(_: NextRequest): Promise<NextResponse> {
   try {

@@ -1,6 +1,6 @@
 // src/api/getTrades/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { getDb } from '@/lib/mongodb';
+import { getDb } from '@/lib/mongodb/mongodb';
 import { ObjectId } from 'mongodb';
 
 // Define a Trade interface for type safety

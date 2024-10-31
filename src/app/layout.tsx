@@ -3,7 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 
 // Import the cron job
-import '@/jobs/tradeBot';
+import '@/jobs/tradeBot/tradeBot';
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",

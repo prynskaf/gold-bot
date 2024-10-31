@@ -1,10 +1,8 @@
-// src/api/trade/route.ts
+// /src/api/trade/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { calculateRSI } from '@/utils/rsi';
-import { getDb } from '@/lib/mongodb';
-import { fetchGoldPrice } from '@/utils/fetchGoldPrice';
-
-
+import { calculateRSI } from '@/utils/rsi/rsi';
+import { getDb } from '@/lib/mongodb/mongodb';
+import { fetchGoldPrice } from '@/utils/fetchGoldPrice/fetchGoldPrice';
 
 export async function POST(_: NextRequest): Promise<NextResponse> {
   try {

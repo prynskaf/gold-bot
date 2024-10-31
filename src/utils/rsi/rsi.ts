@@ -1,4 +1,4 @@
-// src/utils/rsi.ts
+// /src/utils/rsi/rsi.ts
 export function calculateRSI(prices: { price: number }[]): number | null {
   if (prices.length < 14) {
     console.warn('Insufficient price data for RSI calculation');
@@ -22,13 +22,12 @@ export function calculateRSI(prices: { price: number }[]): number | null {
   const averageGain = gains.reduce((a, b) => a + b, 0) / gains.length;
   const averageLoss = losses.reduce((a, b) => a + b, 0) / losses.length;
 
-  // Avoid division by zero
   if (averageLoss === 0) {
-    return averageGain === 0 ? null : 100; // Max RSI if no losses
+    return averageGain === 0 ? null : 100;
   }
 
   const relativeStrength = averageGain / averageLoss;
   const rsi = 100 - (100 / (1 + relativeStrength));
 
-  return rsi;
+  return Math.round(rsi * 100) / 100; // Round to 2 decimal places
 }
